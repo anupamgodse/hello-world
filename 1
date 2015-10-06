@@ -7,20 +7,20 @@ int main(int argc, char *argv[]) {
 	myplan mp;
 	initmyplan(&mp);
 	d = opendir(argv[1]);
-	if (d == NULL) {
+	if (d == -1) {
 		printf("Open Failed\n");
 		return 0;
 	}
 	//iff exists open the directory;
-	mydir md;
-	initmydir(&md);
 	//create mydir;
+	mydir md;
 	//at this state we dont know whether we have any files or directories present in this directory. Hence nhead = nprev = mnext = NULL(mprev = NULL)
+	initmydir(&md);
 	//make head(and tail) point to this directory;(myplan)
 	myplan->head = myplan->tail = &md;
 	stat fstat;
 	while(dir = read(dp)) {
-		stat("dir->d_name", &fstat);
+		stat(dir->d_name, &fstat);
 		//identify dirent as file or directory;
 		if(!(S_ISDIR(fstat.st_mode))) {
 		//iff a dirent is a file(implies the file is present in given directory) 
