@@ -40,7 +40,7 @@ int main(int argc, char **argv) {
     		printf("out of memory!\n");
     		exit(1);
   	}
-
+	/*creating a copy of given argument list*/
   	for (i = 0; i < argc; i++) {
     		args[i] = (char *) malloc(strlen(argv[i]) + 1);
 	    	if (args[i] == NULL) {
@@ -52,6 +52,7 @@ int main(int argc, char **argv) {
     		strcpy(args[i], argv[i]);
   	}
 	
+	/*set the given options*/
 	while ((opt = getopt_long(argc, argv, "frR1SndNAmsHhq", long_options, NULL)) != EOF) {
    		 switch (opt) {
     			case 'f':
@@ -101,6 +102,7 @@ int main(int argc, char **argv) {
 				exit(1);
 		}
   	}
+  	
   	if (optind >= argc) {
    	 	printf("no directories specified\n");
     		exit(1);
@@ -130,6 +132,7 @@ int main(int argc, char **argv) {
 		exit(1);
 	}
 	
+	/*taking all names of directories specified*/
 	
 	for(i = optind; i < argc; i++) {
 		myname[i - optind] = (char *)malloc(strlen(argv[i]) + 1);
@@ -140,6 +143,7 @@ int main(int argc, char **argv) {
 		strcpy(myname[i - optind], argv[i]);
 	}	
 	
+	/*if -R is option given then seperating the directories for which subdirectories are to be searched*/
 	if (recurseafter == 1) {
    	 	rafter = getindex(argc, args);
     		
@@ -166,8 +170,10 @@ int main(int argc, char **argv) {
 	if(!hideprogress)
 		printf("Progress[%d/%d] %d%%", 0, mp->count, (int)((float)0 / mp->count * 100));
 	
+	/*the function linkbysize links the files with same sizes*/ 
 	linkbysize(mp);
 	
+	/*the function linkbyhashing further links files with same sizes also having same hashing only*/
 	linkbyhashing(mp);
 	
 	mydir *p = mp->head;
@@ -181,17 +187,22 @@ int main(int argc, char **argv) {
 		p = p->mnext;
 	}
 	
+	/*the function finallink finally links all the exact duplicates*/
 	finallink(mp);
 	
 	if(!hideprogress)
 		printf("\rProgress[%d/%d] %d%%", mp->count, mp->count, (int)((float)(mp->count) / mp->count * 100));
 	
 		printf("\r                                                 \r");
+	
 	if(summarize == 1)
 		summarizefiles(mp);
 	else
 		printmyplan(mp);
+	
+	/*destroy frees all the memories allocated*/
 	destroy(mp);
+	
 	return 0;
 }
 
@@ -226,9 +237,12 @@ void takefilesfrom(myplan *mp, char *myname) {
 	
 	appendmyplan(mp, ndir);
 	
+	/*check for each dirent in the directory if it is file then append it to list under current directory else if it is a directory 
+	 *go inside that directory and repeat the process recurssively
+	 */ 
 	while((dir = readdir(dp))) {
 		if (strcmp(dir->d_name, ".") && strcmp(dir->d_name, "..")) {
-		
+			/*check for hidden files*/		
 			if((dir->d_name[0] == '.') && (nohidden))
 				continue;
 			
@@ -250,11 +264,12 @@ void takefilesfrom(myplan *mp, char *myname) {
 				free(new);
 				continue;
 			}
-			
+			/*if directory then take files from that directory*/
 			if((S_ISDIR(s.st_mode)) && (recurse && (symlinks || !S_ISLNK(ls.st_mode)))) {
 					myname = new;
 					takefilesfrom(mp, myname);
 			}
+			/*if regular file then append it to current directory list*/
 			else if((S_ISREG(ls.st_mode) || (S_ISLNK(ls.st_mode) && symlinks)) && !(S_ISDIR(s.st_mode))) {
 				node *mn = (node *)malloc(sizeof(node));
 				if(!mn) {
@@ -338,6 +353,7 @@ void linkbyhashing(myplan *mp) {
 		q = p->nhead;	
 		while(q) {
 			n = r = q;
+			/*the function getsign gets hash of a file*/
 			s1 = getsign(q->mypath);
 			
 			for(k = 0; k < i; k++) {  
@@ -429,8 +445,10 @@ void finallink(myplan *mp) {
 				else {
 					if(!hideprogress)
 						printf("\rProgress[%d/%d] %d%%", count, mp->count, (int)((float)count / mp->count * 100));
+					/*the function comparefiles compares two files given byte by byte and returns 0 on success*/
 					result = comparefiles(r->mypath, n->mypath);
 				}
+				/*if result is 0 then link the files as they are duplictes*/
 				if(result == 0) {
 					n->visited = 1; 
 					r->dup = n;
