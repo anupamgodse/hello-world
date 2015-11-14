@@ -255,7 +255,7 @@ void takefilesfrom(myplan *mp, char *myname) {
 					myname = new;
 					takefilesfrom(mp, myname);
 			}
-			else if(S_ISREG(ls.st_mode) || (S_ISLNK(ls.st_mode) && symlinks)) {
+			else if((S_ISREG(ls.st_mode) || (S_ISLNK(ls.st_mode) && symlinks)) && !(S_ISDIR(s.st_mode))) {
 				node *mn = (node *)malloc(sizeof(node));
 				if(!mn) {
 					printf("Out of Memory :\n");
@@ -504,7 +504,7 @@ void printmyplan(myplan *mp) {
 					
 					if((!omitfirst) && (!delete)) 
 						printf("%s", q->mypath);
-					else {
+					else if(delete){
 						printf("[%d]", i++);
 						printf("%s", q->mypath);
 					}	
