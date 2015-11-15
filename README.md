@@ -25,7 +25,7 @@ Usage
 Usage: 
 		1. make
 		Run the code as:
-		2. >./projectfdupes [options] DIRECTORY...(in ubuntu)
+		2. >./project [options] DIRECTORY...(in ubuntu)
 
 -f --omitfirst   omit the first file in each set of matches(while using 
 		     this option with delete it will show all files).
