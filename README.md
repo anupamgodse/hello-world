@@ -57,8 +57,9 @@ Usage:
 
 -H --hardlinks   normally, when two or more files point to the same
 		     disk area they are treated as non-duplicates; this 
-                option w  l change this behavior.
--q --quiet       hide progress indicator              
+                 option will change this behavior.
+
+-q --quiet       hide progress indicator.
 
 -h --help        display this help message.
 
